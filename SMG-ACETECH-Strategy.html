@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SMG × ACETECH Growth Strategy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0a1628;--navy-2:#0f1f36;
+  --paper:#f6f2ea;--paper-2:#ece5d7;
+  --gold:#d4a017;--gold-soft:#e3c47a;--gold-deep:#9a7410;
+  --red:#d42a2f;--red-l:#ef5a5f;
+  --ink:#0a1628;--ink-2:#3b4558;--ink-3:#6b7385;
+  --cream:#f6f2ea;--cream-2:rgba(246,242,234,.74);--cream-3:rgba(246,242,234,.48);
+  --line-d:rgba(246,242,234,.12);--line-l:rgba(10,22,40,.12);
+  --sans:'DM Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --serif:'Playfair Display',Georgia,'Times New Roman',serif;
+  --mono:'DM Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#04090f}
+body{font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#stage{position:relative;flex:none;width:1600px;height:900px;overflow:hidden;transform-origin:50% 50%;background:var(--navy)}
+.ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ---------- slide shell ---------- */
+.slide{position:absolute;inset:0;opacity:0;visibility:hidden;transform:scale(1.012);
+  transition:opacity .7s ease,transform .9s cubic-bezier(.2,.7,.2,1),visibility 0s linear .7s}
+.slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .7s ease,transform .9s cubic-bezier(.2,.7,.2,1),visibility 0s}
+.dark{color:var(--cream);background:
+  radial-gradient(1100px 650px at 88% -12%,rgba(38,68,118,.55) 0%,rgba(38,68,118,0) 62%),
+  radial-gradient(900px 600px at -10% 115%,rgba(212,160,23,.07) 0%,rgba(212,160,23,0) 60%),
+  linear-gradient(160deg,#0c1a30 0%,#0a1628 55%,#08121f 100%)}
+.light{color:var(--ink);background:
+  radial-gradient(900px 500px at 100% 0%,rgba(212,160,23,.08),rgba(212,160,23,0) 60%),
+  linear-gradient(170deg,#f9f6f0 0%,#f2ede3 100%)}
+.meta{position:absolute;top:42px;left:110px;right:110px;display:flex;justify-content:space-between;
+  font:500 12.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;opacity:.5}
+.body{position:absolute;top:118px;left:110px;right:110px;bottom:110px;display:flex;flex-direction:column}
+.eyebrow{font:500 13.5px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
+  display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.eyebrow::before{content:"";width:34px;height:1px;background:currentColor}
+.light .eyebrow{color:var(--gold-deep)}
+h1,h2{font-weight:600;letter-spacing:-.028em}
+h2{font-size:60px;line-height:1.07;max-width:1340px}
+h1 em,h2 em{font-family:var(--serif);font-style:italic;font-weight:500;letter-spacing:-.01em;color:var(--gold-soft)}
+.light h2 em{color:var(--gold-deep)}
+.k{font:500 12.5px/1.2 var(--mono);letter-spacing:.18em;text-transform:uppercase}
+
+/* ---------- motion ---------- */
+.r{opacity:0}
+.slide.active .r{animation:rise .9s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--d,0) * 100ms + 220ms)}
+.slide.leaving .r{opacity:1}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.draw{stroke-dasharray:1;stroke-dashoffset:1}
+.slide.active .draw{animation:draw 1.8s cubic-bezier(.45,.1,.2,1) forwards;animation-delay:calc(var(--d,0) * 100ms + 350ms)}
+.slide.leaving .draw{stroke-dashoffset:0}
+@keyframes draw{to{stroke-dashoffset:0}}
+.spin{transform-origin:500px 500px;animation:spin 90s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){
+  .r{opacity:1}.slide.active .r{animation:none}.draw{stroke-dashoffset:0}.slide.active .draw{animation:none}
+  .spin,.drip{animation:none!important}.slide{transition:opacity .3s ease}
+}
+
+/* ---------- HUD ---------- */
+#hud{position:absolute;left:110px;right:110px;bottom:30px;height:34px;display:flex;align-items:center;justify-content:space-between;
+  font:500 11.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;z-index:20;transition:color .5s}
+.tone-dark #hud{color:rgba(246,242,234,.5)}
+.tone-light #hud{color:rgba(10,22,40,.5)}
+#hud .brand{display:flex;align-items:center;gap:10px}
+#hud .brand i{width:7px;height:7px;background:var(--gold);transform:rotate(45deg);display:block}
+#hint{transition:opacity .6s}
+#hint.off{opacity:0}
+#hud .nav{display:flex;align-items:center;gap:12px}
+#hud button{all:unset;cursor:pointer;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  border:1px solid currentColor;transition:background .2s,color .2s}
+#hud button:hover{background:rgba(212,160,23,.18);color:var(--gold)}
+#hud button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#hud button svg{width:16px;height:16px}
+#count{min-width:74px;text-align:center}
+#bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(127,127,127,.14);z-index:20}
+#bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold-soft));transition:width .6s cubic-bezier(.2,.7,.2,1)}
+
+/* ---------- S1 ---------- */
+.orbit{position:absolute;width:1000px;height:1000px;pointer-events:none}
+.s1 .orbit{right:-300px;top:-330px;opacity:.9}
+.s1 h1{font-size:94px;line-height:1.03;margin:6px 0 30px;max-width:1320px}
+.s1 h1 .a{font-weight:300;color:var(--cream-2)}
+.s1 .lede{font-size:26px;line-height:1.45;color:var(--cream-2);max-width:1200px}
+.s1 .tl{margin-top:auto;width:100%;height:110px;overflow:visible}
+.s1 .by{margin-top:22px;font-size:18px;color:var(--cream-3)}
+.s1 .by b{color:var(--cream);font-weight:600}
+svg .tm{font-family:var(--mono);font-size:12px;letter-spacing:.16em}
+svg .ts{font-family:var(--sans)}
+
+/* ---------- S2 ---------- */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);margin-top:44px}
+.stat{padding-left:36px;border-left:1px solid var(--line-d)}
+.stat:first-child{padding-left:0;border-left:0}
+.stat .num{font-family:var(--serif);font-weight:500;font-size:126px;line-height:1;letter-spacing:-.02em;color:var(--cream);white-space:nowrap}
+.stat .num sup{font-family:var(--sans);font-weight:500;font-size:52px;color:var(--gold);vertical-align:baseline;position:relative;top:-52px;margin-left:4px}
+.stat .lab{margin-top:14px;color:var(--cream-3)}
+.geo{margin-top:40px;display:flex;align-items:center;gap:22px}
+.geo .k{color:var(--gold);white-space:nowrap}
+.route{flex:1;display:flex;align-items:center;justify-content:space-between;position:relative}
+.route::before{content:"";position:absolute;left:10px;right:10px;top:50%;height:1px;background:linear-gradient(90deg,rgba(212,160,23,.7),rgba(212,160,23,.18))}
+.pt{position:relative;display:flex;align-items:center;gap:10px;background:#0d1b31;border:1px solid rgba(212,160,23,.35);border-radius:40px;padding:9px 18px;font-size:18px;color:var(--cream)}
+.pt i{width:7px;height:7px;border-radius:50%;background:var(--gold);display:block}
+.s2-bottom{margin-top:auto;display:grid;grid-template-columns:1fr 1.3fr;gap:56px;align-items:end}
+.learning{padding:26px 30px;border-radius:16px;background:linear-gradient(135deg,rgba(212,160,23,.15),rgba(212,160,23,.04));border:1px solid rgba(212,160,23,.32)}
+.learning .k{color:var(--gold);margin-bottom:12px}
+.learning p{font-size:22px;line-height:1.42;color:var(--cream-2)}
+.learning p b{color:var(--cream);font-weight:600}
+.q{font-family:var(--serif);font-style:italic;font-size:29px;line-height:1.38;color:var(--cream);padding-left:30px;border-left:2px solid var(--gold)}
+.q cite{display:block;margin-top:16px;font:500 12.5px var(--mono);font-style:normal;letter-spacing:.18em;text-transform:uppercase;color:var(--cream-3)}
+
+/* ---------- S3 ---------- */
+.s3-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:28px;margin-top:40px}
+.creds{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cred{background:rgba(255,255,255,.7);border:1px solid var(--line-l);border-radius:14px;padding:22px 24px;min-height:126px}
+.cred .v{font-size:30px;font-weight:600;letter-spacing:-.02em;color:var(--navy);line-height:1.1}
+.cred .l{margin-top:10px;font-size:16px;line-height:1.38;color:var(--ink-3)}
+.cred.hl{background:var(--navy);border-color:var(--navy)}
+.cred.hl .v{color:var(--gold-soft)}
+.cred.hl .l{color:var(--cream-2)}
+.books{margin-top:14px;display:flex;align-items:center;gap:16px;font-size:15.5px;line-height:1.4;color:var(--ink-2);padding:14px 20px;border-radius:12px;border:1px dashed rgba(10,22,40,.22)}
+.books .k{color:var(--gold-deep);white-space:nowrap}
+.books b{color:var(--navy);font-weight:600}
+.ind{background:var(--navy);color:var(--cream);border-radius:18px;padding:28px 30px}
+.ind .k{color:var(--gold)}
+.ind h3{font-size:23px;font-weight:600;margin:12px 0 14px;line-height:1.28;letter-spacing:-.01em}
+.ind ul{list-style:none}
+.ind li{display:flex;align-items:center;gap:16px;padding:13px 0;border-top:1px solid var(--line-d);font-size:19px}
+.ind li .ic{color:var(--gold-soft)}
+.s3-quote{margin-top:auto;font-family:var(--serif);font-style:italic;font-size:35px;line-height:1.3;color:var(--navy);padding-left:30px;border-left:3px solid var(--gold);max-width:1280px}
+
+/* ---------- S4 ---------- */
+.s4-grid{display:grid;grid-template-columns:1fr 64px 1.3fr;margin-top:36px}
+.pane{border-radius:18px;padding:28px 32px;display:flex;flex-direction:column}
+.pane.busy{background:var(--paper-2);border:1px solid var(--line-l)}
+.pane.real{background:linear-gradient(150deg,#14294c,#0a1628);color:var(--cream);box-shadow:0 30px 60px -22px rgba(10,22,40,.5)}
+.busy .k{color:var(--ink-3)}
+.real .k{color:var(--gold)}
+.pane h3{font-size:26px;font-weight:600;margin-top:10px;letter-spacing:-.01em}
+.busy h3{color:var(--ink-3)}
+.pane .viz{width:100%;height:128px;margin:16px 0 18px}
+.pane ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:12px 20px}
+.pane li{display:flex;align-items:center;gap:10px;font-size:18px}
+.busy li{color:var(--ink-3)}
+.busy li::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.55;flex:none}
+.real li .ic{width:20px;height:20px;color:var(--gold)}
+.neq{display:grid;place-items:center;font-family:var(--serif);font-size:58px;color:var(--gold-deep)}
+.takeaway{margin-top:auto;font-size:30px;font-weight:500;letter-spacing:-.015em;color:var(--navy)}
+.takeaway .m{color:var(--ink-3)}
+.takeaway em{font-family:var(--serif);font-style:italic;color:var(--gold-deep)}
+
+/* ---------- S5 ---------- */
+.s5 h2{font-size:56px}
+.eyebrow .rd{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block}
+.s5-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:38px}
+.s5-stat{padding:24px 26px;border-radius:16px;background:rgba(246,242,234,.045);border:1px solid var(--line-d)}
+.s5-stat .n{height:58px;display:flex;align-items:flex-end;font-size:58px;font-weight:600;letter-spacing:-.03em;line-height:1}
+.s5-stat .n.sm{font-size:31px;line-height:1.1}
+.s5-stat .l{margin-top:12px;font-size:15.5px;line-height:1.42;color:var(--cream-2)}
+.s5-stat .l b{display:block;color:var(--cream);font-weight:600;font-size:18px;margin-bottom:4px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.chip{display:inline-flex;align-items:center;gap:9px;padding:9px 16px;border-radius:40px;border:1px solid rgba(212,160,23,.3);font-size:16px;color:var(--cream-2)}
+.chip::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gold)}
+.trust{margin-top:auto;padding-top:24px;border-top:1px solid var(--line-d)}
+.trust .k{color:var(--gold)}
+.trust .row{display:flex;align-items:center;justify-content:space-between;margin-top:18px}
+.trust .row span{font-size:28px;font-weight:600;letter-spacing:-.01em;color:var(--cream)}
+.trust .row span.o{font-size:18px;font-weight:400;color:var(--cream-3)}
+.trust .row i{width:6px;height:6px;border-radius:50%;background:var(--red);display:block}
+.foot{margin-top:14px;font-size:12.5px;color:var(--cream-3)}
+
+/* ---------- S6 ---------- */
+.s6 .hdr{display:flex;justify-content:space-between;align-items:flex-start}
+.tagp{font:500 11.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-deep);padding:9px 14px;border:1px solid rgba(154,116,16,.45);border-radius:30px;background:rgba(212,160,23,.07)}
+.s6 h2{font-size:52px}
+.s6 .sub{margin-top:14px;font-size:21px;color:var(--ink-2)}
+.dia{width:100%;height:410px;margin-top:auto;overflow:visible}
+
+/* ---------- S7 ---------- */
+.s7 .body{align-items:center;text-align:center}
+.s7 .eyebrow::after{content:"";width:34px;height:1px;background:currentColor}
+.s7 h2{font-size:68px}
+.s7 .track{width:100%;height:56px;margin-top:38px}
+.phases{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;width:100%;text-align:left}
+.phase{position:relative;padding:30px 32px 28px;border-radius:20px;background:linear-gradient(170deg,rgba(246,242,234,.08),rgba(246,242,234,.02));border:1px solid var(--line-d);min-height:328px;display:flex;flex-direction:column}
+.phase .no{font-family:var(--serif);font-size:62px;line-height:1;color:transparent;-webkit-text-stroke:1px var(--gold-soft)}
+.phase .nm{margin-top:18px;color:var(--gold);letter-spacing:.26em}
+.phase h3{margin-top:10px;font-size:29px;line-height:1.2;font-weight:600;letter-spacing:-.02em}
+.phase p{margin-top:12px;font-size:17.5px;line-height:1.5;color:var(--cream-2)}
+.phase .when{margin-top:auto;padding-top:18px;color:var(--cream-3)}
+.phase .arr{position:absolute;right:-27px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;background:var(--gold);color:var(--navy);display:grid;place-items:center;z-index:2}
+.phase .arr svg{width:14px;height:14px;stroke-width:2.2}
+.s7 .insight{margin-top:28px;font-size:22px;color:var(--cream-2)}
+.s7 .insight b{color:var(--gold-soft);font-weight:600}
+
+/* ---------- S8 ---------- */
+.s8-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:38px}
+.cl{background:#fff;border:1px solid var(--line-l);border-radius:18px;padding:24px 28px 14px;position:relative;box-shadow:0 22px 40px -32px rgba(10,22,40,.35)}
+.cl .arr{position:absolute;right:-32px;top:38px;width:24px;height:24px;border-radius:50%;background:var(--navy);color:var(--gold-soft);display:grid;place-items:center}
+.cl .arr svg{width:13px;height:13px;stroke-width:2.2}
+.cl .hd{display:flex;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--line-l)}
+.ib,span.ib,.fs span.ib,.dc span.ib{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex:none;margin:0}
+.cl .ib{background:var(--navy);color:var(--gold-soft)}
+.cl .hd .k{color:var(--gold-deep)}
+.cl .hd h3{font-size:22px;font-weight:600;color:var(--navy);margin-top:4px}
+.st{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:13px 0;border-bottom:1px dashed var(--line-l)}
+.st:last-child{border-bottom:0}
+.st .n{font:500 13px var(--mono);color:var(--gold-deep);padding-top:4px}
+.st b{display:block;font-size:18px;font-weight:600;color:var(--navy);line-height:1.3}
+.st span{display:block;margin-top:3px;font-size:15.5px;line-height:1.45;color:var(--ink-3)}
+.outcome{margin-top:auto;display:flex;align-items:center;gap:20px;padding:20px 28px;border-radius:14px;background:var(--navy);color:var(--cream);font-size:21px}
+.outcome .k{color:var(--gold);padding:8px 13px;border:1px solid rgba(212,160,23,.45);border-radius:30px;white-space:nowrap}
+
+/* ---------- S9 ---------- */
+.s9-grid{display:grid;grid-template-columns:1fr 1.18fr;gap:52px;margin-top:38px;align-items:start}
+.fs{display:grid;grid-template-columns:52px 1fr;gap:18px;padding:11px 0;position:relative}
+.fs:not(:last-child)::before{content:"";position:absolute;left:26px;top:66px;bottom:-11px;width:1px;background:rgba(212,160,23,.32)}
+.fs span.ib{width:52px;height:52px;border-radius:14px;border:1px solid rgba(212,160,23,.42);color:var(--gold-soft);background:rgba(212,160,23,.07)}
+.fs .k{color:var(--gold)}
+.fs b{display:block;font-size:20px;font-weight:600;margin-top:5px}
+.fs span{display:block;font-size:16px;color:var(--cream-2);margin-top:4px;line-height:1.42}
+.fw{border-radius:20px;background:rgba(246,242,234,.045);border:1px solid var(--line-d);padding:26px 28px 28px}
+.fw .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.fw .hd .k{color:var(--gold)}
+.fw .hd small{font-size:14px;color:var(--cream-3)}
+.tier{display:grid;grid-template-columns:118px 1fr 1fr;gap:22px;align-items:center;padding:18px 22px;border-radius:14px;background:rgba(5,12,24,.45);border-left:4px solid var(--c);margin-top:12px}
+.tier .tg{font-weight:700;font-size:19px;letter-spacing:.08em;color:var(--c);display:flex;align-items:center;gap:10px}
+.tier .tg i{width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 14px var(--c);display:block}
+.tier .who{font-size:16px;line-height:1.42;color:var(--cream-2)}
+.tier .nx{font-size:16px;line-height:1.42;color:var(--cream)}
+.tier .nx small{display:block;font:500 10.5px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--cream-3);margin-bottom:4px}
+.hot{--c:#ef5a5f}.warm{--c:#e0b33c}.cold{--c:#8ea3c2}
+
+/* ---------- S10 ---------- */
+.pipe{display:flex;margin-top:40px}
+.cv{flex:1;height:112px;margin-left:-14px;padding:0 34px 0 46px;display:flex;flex-direction:column;justify-content:center;color:var(--cream);
+  clip-path:polygon(0 0,calc(100% - 28px) 0,100% 50%,calc(100% - 28px) 100%,0 100%,28px 50%)}
+.cv:first-child{margin-left:0;padding-left:30px;clip-path:polygon(0 0,calc(100% - 28px) 0,100% 50%,calc(100% - 28px) 100%,0 100%)}
+.cv .n{font:500 11px var(--mono);letter-spacing:.2em;opacity:.65}
+.cv b{font-size:19px;font-weight:600;line-height:1.25;margin-top:6px}
+.cv:nth-child(1){background:#3a4e72}.cv:nth-child(2){background:#2a3e62}.cv:nth-child(3){background:#1d3153}.cv:nth-child(4){background:#122545}
+.cv:nth-child(5){background:linear-gradient(120deg,#d4a017,#e3c47a);color:var(--navy)}
+.disc-k{margin-top:auto;color:var(--gold-deep)}
+.disc{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:16px}
+.dc{background:#fff;border:1px solid var(--line-l);border-radius:16px;padding:24px 24px 26px}
+.dc .ib{background:var(--paper-2);color:var(--navy)}
+.dc b{display:block;margin-top:16px;font-size:20px;font-weight:600;color:var(--navy)}
+.dc span{display:block;margin-top:8px;font-size:15.5px;line-height:1.48;color:var(--ink-3)}
+
+/* ---------- S11 ---------- */
+.dash{margin-top:38px;border-radius:22px;background:linear-gradient(170deg,#14284c,#0c1a33);border:1px solid rgba(246,242,234,.1);box-shadow:0 40px 80px -30px rgba(0,0,0,.6);overflow:hidden}
+.dash .top{display:flex;justify-content:space-between;align-items:center;padding:16px 28px;border-bottom:1px solid var(--line-d)}
+.dash .t{display:flex;align-items:center;gap:16px;font-size:16px;font-weight:600}
+.dots{display:flex;gap:6px}.dots i{width:9px;height:9px;border-radius:50%;background:rgba(246,242,234,.2);display:block}
+.status{color:var(--gold);padding:8px 13px;border:1px solid rgba(212,160,23,.4);border-radius:30px;display:flex;gap:9px;align-items:center}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--gold);display:block;animation:pulse 2s ease-in-out infinite}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-d)}
+.tile{background:#0f2140;padding:22px 28px 24px;min-height:170px;display:flex;flex-direction:column}
+.tile .row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.tile .nm{font-size:18px;font-weight:600;line-height:1.32}
+.stg{font:500 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;padding:6px 9px;border-radius:20px;background:rgba(246,242,234,.08);color:var(--cream-2);white-space:nowrap}
+.tile .val{margin-top:auto;display:flex;align-items:baseline;gap:12px}
+.tile .val small{font:500 10.5px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--cream-3)}
+.tile .val span{font-family:var(--serif);font-style:italic;font-size:26px;color:var(--gold-soft)}
+.trk{margin-top:12px;height:6px;border-radius:6px;background:rgba(246,242,234,.07);position:relative;overflow:hidden}
+.trk::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(212,160,23,.4) 0 6px,transparent 6px 12px)}
+.s11 .note{margin-top:22px;font-size:18px;color:var(--cream-2)}
+
+/* ---------- S12 ---------- */
+.plans{display:grid;grid-template-columns:1fr 1.12fr;gap:28px;margin-top:30px}
+.plan{position:relative;border-radius:22px;padding:28px 36px 22px;display:flex;flex-direction:column}
+.plan.a{background:#fff;border:1px solid var(--line-l)}
+.plan.b{background:linear-gradient(160deg,#15294d,#0a1628 72%);color:var(--cream);border:1.5px solid var(--gold);box-shadow:0 40px 70px -30px rgba(10,22,40,.6)}
+.badge{position:absolute;top:-15px;left:36px;background:var(--gold);color:var(--navy);font:500 11px/1 var(--mono);letter-spacing:.14em;padding:9px 14px;border-radius:30px;text-transform:uppercase}
+.plan .opt{color:var(--gold-deep)}
+.plan.b .opt{color:var(--gold)}
+.plan h3{font-size:29px;font-weight:600;letter-spacing:-.02em;margin-top:8px}
+.plan .fee{display:flex;align-items:baseline;gap:12px;margin-top:16px}
+.plan .fee .p{font-size:56px;font-weight:600;letter-spacing:-.035em;line-height:1}
+.plan .fee .g{font-size:20px;color:var(--ink-3)}
+.plan.b .fee .g{color:var(--cream-2)}
+.plan .tot{margin-top:10px;font:500 13px var(--mono);letter-spacing:.06em;color:var(--ink-3)}
+.plan.b .tot{color:var(--cream-3)}
+.inc{margin-top:18px;padding-top:16px;border-top:1px solid var(--line-l);list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:11px 22px}
+.plan.b .inc{border-color:var(--line-d)}
+.inc li{display:flex;gap:10px;font-size:15.5px;line-height:1.38;color:var(--ink-2)}
+.plan.b .inc li{color:var(--cream)}
+.inc .ic{width:18px;height:18px;color:var(--gold-deep);margin-top:1px}
+.plan.b .inc .ic{color:var(--gold)}
+.inc li.all{grid-column:1/-1;font-weight:600;color:var(--gold-soft)}
+.fit{margin-top:auto;padding-top:16px;font-size:15px;line-height:1.45;color:var(--ink-3);display:flex;gap:10px;align-items:flex-start}
+.fit .ic{width:19px;height:19px;color:var(--gold-deep)}
+.plan.b .fit{color:var(--cream-2)}
+.plan.b .fit .ic{color:var(--gold)}
+.terms{margin-top:14px;font-size:13px;line-height:1.55;color:var(--ink-3);max-width:1320px}
+
+/* ---------- S13 ---------- */
+.s13 h2{font-size:50px}
+.s13-grid{display:grid;grid-template-columns:350px 1fr;gap:56px;margin-top:38px}
+.spent{padding:24px 28px;border-radius:18px;border:1px solid var(--line-d);background:rgba(246,242,234,.035)}
+.spent .k{color:var(--cream-3);margin-bottom:6px}
+.spent ul{list-style:none}
+.spent li{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--line-d);font-size:17.5px;color:var(--cream-2)}
+.spent li .ic{color:var(--gold-soft);width:20px;height:20px}
+.spent .end{margin-top:16px;font-family:var(--serif);font-style:italic;font-size:23px;line-height:1.3;color:var(--cream)}
+.pipesvg{width:100%;height:170px;overflow:visible}
+.leaks{display:grid;grid-template-columns:repeat(3,1fr);margin-top:6px}
+.leak{text-align:center;padding:0 16px}
+.leak .k{color:var(--red-l)}
+.leak b{display:block;font-size:19px;font-weight:600;margin-top:8px}
+.leak span{display:block;margin-top:6px;font-size:15.5px;line-height:1.45;color:var(--cream-2)}
+.drip{animation:drip 2.6s ease-in infinite}
+@keyframes drip{0%{transform:translateY(0);opacity:0}15%{opacity:1}100%{transform:translateY(34px);opacity:0}}
+.s13 .close{margin-top:auto;font-size:26px;font-weight:500;letter-spacing:-.01em}
+.s13 .close em{font-family:var(--serif);font-style:italic;color:var(--gold-soft)}
+
+/* ---------- S14 ---------- */
+.s14 .orbit{left:-420px;bottom:-560px;opacity:.7}
+.s14 h2{font-size:64px;max-width:1260px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:42px}
+.stp{padding:26px 28px;border-radius:18px;border:1px solid var(--line-d);background:rgba(246,242,234,.045);display:flex;gap:20px;align-items:flex-start}
+.stp .n{font-family:var(--serif);font-size:52px;line-height:.9;color:var(--gold-soft)}
+.stp b{display:block;font-size:21px;font-weight:600;line-height:1.3}
+.stp span{display:block;margin-top:6px;font-size:15.5px;color:var(--cream-2);line-height:1.45}
+.urg{margin-top:20px;font-size:17px;color:var(--cream-2);display:flex;align-items:center;gap:12px}
+.urg .ic{color:var(--gold);width:20px;height:20px}
+.final{margin-top:auto;display:grid;grid-template-columns:1fr auto;gap:60px;align-items:end;padding-top:26px;border-top:1px solid var(--line-d)}
+.final blockquote{font-family:var(--serif);font-style:italic;font-size:29px;line-height:1.36;max-width:900px}
+.sig{text-align:right}
+.sig b{display:block;font-size:20px;font-weight:600}
+.sig span{display:block;margin-top:6px;color:var(--cream-3)}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></symbol>
+  <symbol id="i-mega" viewBox="0 0 24 24"><path d="M3 10v4h4l6 4V6L7 10z"/><path d="M17 9a4 4 0 010 6"/></symbol>
+  <symbol id="i-grain" viewBox="0 0 24 24"><path d="M12 21V7"/><path d="M12 9c-3-.6-4.5-3-4.5-5 2.4.3 4.5 2.2 4.5 5zM12 9c3-.6 4.5-3 4.5-5-2.4.3-4.5 2.2-4.5 5zM12 15c-3-.6-4.5-3-4.5-5 2.4.3 4.5 2.2 4.5 5zM12 15c3-.6 4.5-3 4.5-5-2.4.3-4.5 2.2-4.5 5z"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></symbol>
+  <symbol id="i-build" viewBox="0 0 24 24"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></symbol>
+  <symbol id="i-batt" viewBox="0 0 24 24"><rect x="2" y="7" width="17" height="10" rx="2"/><path d="M22 11v2M6 10v4M9.5 10v4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.5a3.5 3.5 0 010 7M18 14.8c1.8.7 3 2.6 3.5 5.2"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 011-1h3M16 4h3a1 1 0 011 1v3M20 16v3a1 1 0 01-1 1h-3M8 20H5a1 1 0 01-1-1v-3M7 12h10"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4h11l-2 4 2 4H5"/></symbol>
+  <symbol id="i-owner" viewBox="0 0 24 24"><circle cx="10" cy="8" r="4"/><path d="M3 21c1-4 4-6 7-6 1.5 0 3 .4 4.2 1.2M15 19l2 2 4-4"/></symbol>
+  <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 20h18M6 16v-4M11 16V8M16 16v-6M20 16V5"/></symbol>
+  <symbol id="i-stall" viewBox="0 0 24 24"><path d="M3 9l2-5h14l2 5M3 9h18M3 9a3 3 0 006 0 3 3 0 006 0 3 3 0 006 0M5 12v8h14v-8"/></symbol>
+  <symbol id="i-plane" viewBox="0 0 24 24"><path d="M10.5 13.5L3 11l1.5-1.5 7.5 1L16.5 6a2 2 0 013 3l-4.5 4.5 1 7.5L14.5 22l-2.5-7.5L8 18.5V21l-1.5 1L5 19l-3-1.5L3 16h2.5z"/></symbol>
+  <symbol id="i-time" viewBox="0 0 24 24"><path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></symbol>
+</svg>
+
+<div id="viewport"><div id="stage" class="tone-dark">
+
+<!-- 01 · BIG IDEA -->
+<section class="slide dark s1" data-tone="dark">
+  <svg class="orbit" viewBox="0 0 1000 1000" aria-hidden="true">
+    <g fill="none" stroke="rgba(212,160,23,.16)" stroke-width="1">
+      <circle cx="500" cy="500" r="170"/><circle cx="500" cy="500" r="270"/><circle cx="500" cy="500" r="370"/><circle cx="500" cy="500" r="470"/>
+    </g>
+    <g class="spin"><circle cx="870" cy="500" r="5" fill="#d4a017"/><circle cx="500" cy="230" r="3.5" fill="#e3c47a" opacity=".7"/><circle cx="30" cy="500" r="3" fill="#e3c47a" opacity=".5"/></g>
+  </svg>
+  <div class="meta"><span>The Brandologist Co.</span><span>Prepared for Store My Goods · ACETECH 2026</span></div>
+  <div class="body">
+    <div class="eyebrow r" style="--d:0">Exhibition ROI · Architect Partnerships</div>
+    <h1 class="r" style="--d:1"><span class="a">Don't Just Exhibit.</span><br>Build Business That <em>Continues</em> After ACETECH.</h1>
+    <p class="lede r" style="--d:3">An Exhibition ROI &amp; Architect Partnership Growth Strategy for Store My Goods.</p>
+    <svg class="tl r" style="--d:4" viewBox="0 0 1380 110" aria-hidden="true">
+      <defs><linearGradient id="fadeL" x1="0" x2="1"><stop offset="0" stop-color="#e3c47a" stop-opacity=".9"/><stop offset="1" stop-color="#e3c47a" stop-opacity=".25"/></linearGradient></defs>
+      <text class="tm" x="0" y="14" fill="#d4a017">ACETECH · THE SHOW DAYS</text>
+      <rect x="0" y="34" width="56" height="12" rx="2" fill="#d4a017"/><rect x="66" y="34" width="56" height="12" rx="2" fill="#d4a017"/>
+      <rect x="132" y="34" width="56" height="12" rx="2" fill="#d4a017"/><rect x="198" y="34" width="56" height="12" rx="2" fill="#d4a017"/>
+      <text class="tm" x="300" y="14" fill="rgba(246,242,234,.5)">THE BUSINESS THAT FOLLOWS</text>
+      <path class="draw" style="--d:6" pathLength="1" d="M272 40 H1360" stroke="url(#fadeL)" stroke-width="1.5" fill="none"/>
+      <path d="M1352 34 l9 6 -9 6" stroke="rgba(227,196,122,.5)" stroke-width="1.5" fill="none"/>
+      <g fill="#0b182d" stroke="#e3c47a" stroke-width="1.5">
+        <circle cx="440" cy="40" r="6"/><circle cx="680" cy="40" r="6"/><circle cx="920" cy="40" r="6"/><circle cx="1160" cy="40" r="6"/>
+      </g>
+      <g class="ts" font-size="17" fill="rgba(246,242,234,.78)" text-anchor="middle">
+        <text x="440" y="80">Follow-ups</text><text x="680" y="80">Meetings</text><text x="920" y="80">Proposals</text><text x="1160" y="80">Partnerships</text>
+      </g>
+    </svg>
+    <div class="by r" style="--d:6">Presented by <b>Sudhir Makhija</b> · The Brandologist Co.</div>
+  </div>
+</section>
+
+<!-- 02 · EXPERIENCE -->
+<section class="slide dark s2" data-tone="dark">
+  <div class="meta"><span>The Brandologist Co. × Store My Goods</span><span>Experience</span></div>
+  <div class="body">
+    <div class="eyebrow r" style="--d:0">From the exhibition floor</div>
+    <h2 class="r" style="--d:1">100+ Exhibitions. <em>One</em> Important Learning.</h2>
+    <div class="stats">
+      <div class="stat r" style="--d:2"><div class="num"><span data-count="100">100</span><sup>+</sup></div><div class="lab k">Exhibitions</div></div>
+      <div class="stat r" style="--d:3"><div class="num"><span data-count="21">21</span><sup>+</sup></div><div class="lab k">Years in business</div></div>
+      <div class="stat r" style="--d:4"><div class="num"><span data-count="5">5</span></div><div class="lab k">Exhibition geographies</div></div>
+    </div>
+    <div class="geo r" style="--d:5">
+      <span class="k">Exhibited across</span>
+      <div class="route"><span class="pt"><i></i>India</span><span class="pt"><i></i>London</span><span class="pt"><i></i>South Africa</span><span class="pt"><i></i>Dubai</span><span class="pt"><i></i>Germany</span></div>
+    </div>
+    <div class="s2-bottom">
+      <div class="learning r" style="--d:6"><div class="k">The learning</div><p>Exhibitions are rarely won at the stall alone. <b>They are won in the weeks before and the weeks after.</b></p></div>
+      <blockquote class="q r" style="--d:7">“I've experienced exhibitions as a business owner investing my own money, not merely as someone advising from outside.”<cite>Sudhir Makhija</cite></blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- 03 · BUSINESS OWNER -->
+<section class="slide light s3" data-tone="light">
+  <div class="meta"><span>The Brandologist Co. × Store My Goods</span><span>Business background</span></div>
+  <div class="body">
+    <div class="eyebrow r" style="--d:0">A business owner who understands business owners</div>
+    <h2 class="r" style="--d:1">Strategy Backed by <em>Real Business</em> Experience.</h2>
+    <div class="s3-grid">
+      <div>
+        <div class="creds">
+          <div class="cred hl r" style="--d:2"><div class="v">Director</div><div class="l">M-Core Industries Pvt. Ltd.</div></div>
+          <div class="cred r" style="--d:3"><div class="v">35 years</div><div class="l">Manufacturing business legacy</div></div>
+          <div class="cred r" style="--d:4"><div class="v">~1 lakh</div><div class="l">sq. ft. of manufacturing infrastructure</div></div>
+          <div class="cred r" style="--d:5"><div class="v">Pan-India</div><div class="l">Business operations</div></div>
+          <div class="cred r" style="--d:6"><div class="v">Exports</div><div class="l">To international markets</div></div>
+          <div class="cred r" style="--d:7"><div class="v">21+ years</div><div class="l">Of entrepreneurial experience</div></div>
+        </div>
+        <div class="books r" style="--d:8"><span class="k">Author</span><span>Two Amazon Bestsellers: <b>The Optical Fibre Cable Dealer's Guide to SUCCESS</b> and <b>7 Secrets to Double Your Profits in CCTV Industry</b></span></div>
+      </div>
+      <div class="ind r" style="--d:4">
+        <div class="k">Beyond my own business</div>
+        <h3>Experience working with businesses across sectors</h3>
+        <ul>
+          <li><svg class="ic"><use href="#i-grain"/></svg>Rice exporters</li>
+          <li><svg class="ic"><use href="#i-gear"/></svg>Machinery manufacturers</li>
+          <li><svg class="ic"><use href="#i-build"/></svg>Design-and-build businesses</li>
+          <li><svg class="ic"><use href="#i-batt"/></svg>Mobile battery businesses</li>
+        </ul>
+      </div>
+    </div>
+    <div class="s3-quote r" style="--d:9">“I understand what it means to invest in an exhibition and expect real business in return.”</div>
+  </div>
+</section>
+
+<!-- 04 · THE REAL QUESTION -->
+<section class="slide light s4" data-tone="light">
+  <div class="meta"><span>The Brandologist Co. × Store My Goods</span><span>The real question</span></div>
+  <div class="body">
+    <div class="eyebrow r" style="--d:0">Before we talk about ACETECH</div>
+    <h2 class="r" style="--d:1">Is a Busy Stall the Same as a <em>Successful</em> Exhibition?</h2>
+    <div class="s4-grid">
+      <div class="pane busy r" style="--d:2">
+        <div class="k">What's easy to count</div>
+        <h3>A busy stall</h3>
+        <svg class="viz" id="crowd" viewBox="0 0 500 140" aria-hidden="true"></svg>
+        <ul><li>Footfall</li><li>Business cards collected</li><li>Brochures handed out</li><li>A crowded stall</li></ul>
+      </div>
+      <div class="neq r" style="--d:3">≠</div>
+      <div class="pane real r" style="--d:4">
+        <div class="k">What actually counts</div>
+        <h3>A successful exhibition</h3>
+        <svg class="viz" viewBox="0 0 680 130" aria-hidden="true">
+          <g stroke="rgba(227,196,122,.55)" stroke-width="1.4" fill="none">
+            <path class="draw" style="--d:5" pathLength="1" d="M70 82 L200 36 L330 90 L470 40 L610 82"/>
+            <path class="draw" style="--d:7" pathLength="1" d="M70 82 L330 90 L610 82" stroke-opacity=".35"/>
+            <path class="draw" style="--d:8" pathLength="1" d="M200 36 L470 40" stroke-opacity=".35"/>
+          </g>
+          <g fill="#d4a017">
+            <circle cx="70" cy="82" r="18" opacity=".14"/><circle cx="200" cy="36" r="18" opacity=".14"/><circle cx="330" cy="90" r="18" opacity=".14"/><circle cx="470" cy="40" r="18" opacity=".14"/><circle cx="610" cy="82" r="22" opacity=".18"/>
+            <circle cx="70" cy="82" r="7"/><circle cx="200" cy="36" r="7"/><circle cx="330" cy="90" r="7"/><circle cx="470" cy="40" r="7"/><circle cx="610" cy="82" r="10"/>
+          </g>
+        </svg>
+        <ul>
+          <li><svg class="ic"><use href="#i-check"/></svg>Qualified conversations</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Partner relationships</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Booked meetings</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Real opportunities</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Revenue</li>
+        </ul>
+      </div>
+    </div>
+    <div class="takeaway r" style="--d:6">Footfall is <span class="m">activity</span>. Business outcomes are the <em>objective</em>.</div>
+  </div>
+</section>
+
+<!-- 05 · SMG FOUNDATION -->
+<section class="slide dark s5" data-tone="dark">
+  <div class="meta"><span>The Brandologist Co. × Store My Goods</span><span>Store My Goods</span></div>
+  <div class="body">
+    <div class="eyebrow r" style="--d:0">Why Store My Goods has a strong foundation <span class="rd"></span></div>
+    <h2 class="r" style="--d:1">A Brand Partners Can <em>Confidently Recommend</em>.</h2>
+    <div class="s5-stats">
+      <div class="s5-stat r" style="--d:2"><div class="n"><span data-count="5">5</span></div><div class="l"><b>Major metros</b>Delhi NCR · Mumbai · Bengaluru · Hyderabad · Pune</div></div>
+      <div class="s5-stat r" style="--d:3"><div class="n"><span data-count="50000">50,000</span>+</div><div class="l"><b>Storage months</b>Subscriptions delivered to customers</div></div>
+      <div class="s5-stat r" style="--d:4"><div class="n"><span data-count="5000">5,000</span>+</div><div class="l"><b>Customers</b>Across individuals and businesses</div></div>
+      <div class="s5-stat r" style="--d:5"><div class="n sm">Shark Tank India</div><div class="l"><b>Featured in Season 1</b>Growth round led by JIIF and family offices</div></div>
+    </div>
+    <div class="chips r" style="--d:6">
+      <span class="chip">Household storage</span><span class="chip">Business &amp; warehouse storage</span><span class="chip">Packing &amp; pickup</span>
+      <span class="chip">Insurance coverage</span><span class="chip">24/7 CCTV-monitored facilities</span><span class="chip">Office relocation</span><span class="chip">Document storage</span>
+    </div>
+    <div class="trust r" style="--d:7">
+      <div class="k">Corporate customers include</div>
+      <div class="row"><span>TCS</span><i></i><span>Aditya Birla Group</span><i></i><span>CarDekho</span><i></i><span>CARS24</span><i></i><span>House of Masaba</span><span class="o">and others</span></div>
+      <div class="foot">Customer and storage figures as publicly reported in 2025.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 · HIDDEN OPPORTUNITY -->
+<section class="slide light s6" data-tone="light">
+  <div class="meta"><span>The Brandologist Co. × Store My Goods</span><span>The hidden opportunity</span></div>
+  <div class="body">
+    <div class="hdr r" style="--d:0"><div class="eyebrow">The hidden opportunity</div><span class="tagp">Proposed growth opportunity · to be validated</span></div>
+    <h2 class="r" style="--d:1">An Architect Could Be More Than a Lead. They Could Become a <em>Recurring Business Channel.</em></h2>
+    <p class="sub r" style="--d:2">One designer relationship can touch many homes and offices every year, each with its own moment of storage need.</p>
+    <svg class="dia r" style="--d:3" viewBox="0 0 1380 410" aria-hidden="true">
+      <g class="tm" fill="#6b7385" text-anchor="middle">
+        <text x="110" y="14">PARTNER</text><text x="430" y="14">CLIENT PROJECTS</text><text x="750" y="14">RECURRING NEEDS</text><text x="1010" y="14">STORAGE PARTNER</text><text x="1256" y="14">OUTCOME</text>
+      </g>
+      <!-- connectors -->
+      <g stroke="#9aa3b3" stroke-width="1.5" fill="none">
+        <path class="draw" style="--d:4" pathLength="1" d="M196 200 C270 200 280 80 345 80"/>
+        <path class="draw" style="--d:4" pathLength="1" d="M196 200 C270 200 280 160 345 160"/>
+        <path class="draw" style="--d:4" pathLength="1" d="M196 200 C270 200 280 240 345 240"/>
+        <path class="draw" style="--d:4" pathLength="1" d="M196 200 C270 200 280 320 345 320"/>
+        <path class="draw" style="--d:7" pathLength="1" d="M515 80 C585 80 580 200 640 200"/>
+        <path class="draw" style="--d:7" pathLength="1" d="M515 160 C585 160 580 200 640 200"/>
+        <path class="draw" style="--d:7" pathLength="1" d="M515 240 C585 240 580 200 640 200"/>
+        <path class="draw" style="--d:7" pathLength="1" d="M515 320 C585 320 580 200 640 200"/>
+        <path class="draw" style="--d:9" pathLength="1" d="M860 200 H934" stroke="#0a1628"/>
+        <path class="draw" style="--d:11" pathLength="1" d="M1080 200 H1134" stroke="#0a1628"/>
+      </g>
+      <path d="M928 194 l8 6 -8 6M1128 194 l8 6 -8 6" stroke="#0a1628" stroke-width="1.5" fill="none"/>
+      <!-- architect -->
+      <circle cx="110" cy="200" r="100" fill="none" stroke="#9a7410" stroke-opacity=".35" stroke-dasharray="3 5"/>
+      <circle cx="110" cy="200" r="86" fill="#0a1628"/>
+      <g class="ts" text-anchor="middle" font-weight="600" font-size="18" fill="#f6f2ea"><text x="110" y="194">Architect /</text><text x="110" y="218">Interior Designer</text></g>
+      <!-- projects -->
+      <g fill="#fff" stroke="rgba(10,22,40,.16)"><rect x="345" y="56" width="170" height="48" rx="24"/><rect x="345" y="136" width="170" height="48" rx="24"/><rect x="345" y="216" width="170" height="48" rx="24"/><rect x="345" y="296" width="170" height="48" rx="24"/></g>
+      <g class="ts" text-anchor="middle" font-size="15" fill="#3b4558"><text x="430" y="85">Home renovation</text><text x="430" y="165">Office fit-out</text><text x="430" y="245">Apartment upgrade</text><text x="430" y="325">Commercial project</text></g>
+      <!-- needs -->
+      <rect x="640" y="108" width="220" height="184" rx="18" fill="#fff" stroke="#9a7410" stroke-opacity=".6"/>
+      <text class="ts" x="750" y="142" text-anchor="middle" font-size="17" font-weight="600" fill="#0a1628">Storage needs</text>
+      <g fill="#ece5d7"><rect x="665" y="160" width="170" height="32" rx="16"/><rect x="665" y="200" width="170" height="32" rx="16"/><rect x="665" y="240" width="170" height="32" rx="16"/></g>
+      <g class="ts" text-anchor="middle" font-size="15" fill="#3b4558"><text x="750" y="181">Renovation</text><text x="750" y="221">Relocation</text><text x="750" y="261">Temporary storage</text></g>
+      <!-- SMG -->
+      <circle cx="1010" cy="200" r="84" fill="none" stroke="#d42a2f" stroke-opacity=".28"/>
+      <circle cx="1010" cy="200" r="70" fill="#d42a2f"/>
+      <g class="ts" text-anchor="middle" font-weight="600" font-size="18" fill="#fff"><text x="1010" y="196">Store My</text><text x="1010" y="220">Goods</text></g>
+      <!-- outcome -->
+      <rect x="1140" y="150" width="232" height="100" rx="18" fill="#0a1628"/>
+      <text class="ts" x="1256" y="195" text-anchor="middle" font-size="18" font-weight="600" fill="#f6f2ea">Repeat business</text>
+      <text class="ts" x="1256" y="219" text-anchor="middle" font-size="18" font-weight="600" fill="#e3c47a">&amp; referrals</text>
+      <!-- loop -->
+      <path d="M1256 250 C1256 368 1200 376 1100 376 L260 376 C150 376 110 352 110 302" stroke="#9a7410" stroke-width="1.5" stroke-dasharray="6 6" fill="none"/>
+      <path d="M102 312 L110 300 L118 312" stroke="#9a7410" stroke-width="1.5" fill="none"/>
+      <rect x="440" y="362" width="480" height="28" fill="#f4f0e7"/>
+      <text x="680" y="382" text-anchor="middle" font-family="Playfair Display, Georgia, serif" font-style="italic" font-size="17" fill="#9a7410">Every successful project can strengthen the relationship</text>
+    </svg>
+  </div>
+</section>
+
+<!-- 07 · THREE PHASES -->
+<section class="slide dark s7" data-tone="dark">
+  <div class="meta"><span>The Brandologist Co. × Store My Goods</span><span>The system</span></div>
+  <div class="body">
+    <div class="eyebrow r" style="--d:0">The growth system</div>
+    <h2 class="r" style="--d:1">One Exhibition. <em>Three</em> Critical Phases.</h2>
+    <svg class="track r" style="--d:2" viewBox="0 0 1380 56" aria-hidden="true">
+      <defs><linearGradient id="trk" x1="0" x2="1"><stop offset="0" stop-color="#d4a017"/><stop offset=".5" stop-color="#e3c47a"/><stop offset="1" stop-color="#d4a017"/></linearGradient></defs>
+      <path d="M221 28 H1159" stroke="rgba(246,242,234,.12)" stroke-width="2"/>
+      <path class="draw" style="--d:3" pathLength="1" d="M221 28 H1159" stroke="url(#trk)" stroke-width="2" fill="none"/>
+      <g fill="#0a1628" stroke="#d4a017" stroke-width="2"><circle cx="221" cy="28" r="9"/><circle cx="690" cy="28" r="9"/><circle cx="1159" cy="28" r="9"/></g>
+      <g fill="#d4a017"><circle cx="221" cy="28" r="3.5"/><circle cx="690" cy="28" r="3.5"/><circle cx="1159" cy="28" r="3.5"/></g>
+    </svg>
+    <div class="phases">
+      <div class="phase r" style="--d:3">
+        <div class="no">01</div><div class="nm k">Before</div>
+        <h3>Attract the right people.</h3>
+        <p>Decide who we want to meet, give them a reason to come, and book time with them in advance.</p>
+        <div class="when k">Starts now</div>
+        <span class="arr"><svg class="ic"><use href="#i-arrow"/></svg></span>
+      </div>
+      <div class="phase r" style="--d:4">
+        <div class="no">02</div><div class="nm k">During</div>
+        <h3>Convert visits into qualified conversations.</h3>
+        <p>Clear stall messaging, a team that knows its role, and a simple way to sort every visitor.</p>
+        <div class="when k">The show days</div>
+        <span class="arr"><svg class="ic"><use href="#i-arrow"/></svg></span>
+      </div>
+      <div class="phase r" style="--d:5">
+        <div class="no">03</div><div class="nm k">After</div>
+        <h3>Convert conversations into business opportunities.</h3>
+        <p>Fast, personal follow-up with clear ownership, tracking and reporting.</p>
+        <div class="when k">The weeks that follow</div>
+      </div>
+    </div>
+    <p class="insight r" style="--d:7">Most exhibitors put their effort into <b>During</b>. The outcome is largely decided in <b>Before</b> and <b>After</b>.</p>
+  </div>
+</section>
+
+<!-- 08 · BEFORE -->
+<section class="slide light s8" data-tone="light">
+  <div class="meta"><span>The Brandologist Co. × Store My Goods</span><span>Phase 01 · Before</span></div>
+  <div class="body">
+    <div class="eyebrow r" style="--d:0">Phase 01 · Before ACETECH</div>
+    <h2 class="r" style="--d:1">Decide Who to Meet. <em>Then Invite Them.</em></h2>
+    <div class="s8-grid">
+      <div class="cl r" style="--d:2">
+        <span class="arr"><svg class="ic"><use href="#i-arrow"/></svg></span>
+        <div class="hd"><span class="ib"><svg class="ic"><use href="#i-target"/></svg></span><div><div class="k">Step A</div><h3>Target</h3></div></div>
+        <div class="st"><span class="n">01</span><div><b>Architect &amp; designer audience mapping</b><span>Which firms, which segments, which decision-makers.</span></div></div>
+        <div class="st"><span class="n">02</span><div><b>Partnership proposition</b><span>Why a designer should recommend SMG, and what's in it for them.</span></div></div>
+      </div>
+      <div class="cl r" style="--d:3">
+        <span class="arr"><svg class="ic"><use href="#i-arrow"/></svg></span>
+        <div class="hd"><span class="ib"><svg class="ic"><use href="#i-mail"/></svg></span><div><div class="k">Step B</div><h3>Invite</h3></div></div>
+        <div class="st"><span class="n">03</span><div><b>Invitation campaigns</b><span>Personal, relevant invitations through the right channels.</span></div></div>
+        <div class="st"><span class="n">04</span><div><b>Pre-booked meeting strategy</b><span>Fix meetings before the show instead of hoping for walk-ins.</span></div></div>
+      </div>
+      <div class="cl r" style="--d:4">
+        <div class="hd"><span class="ib"><svg class="ic"><use href="#i-clip"/></svg></span><div><div class="k">Step C</div><h3>Prepare</h3></div></div>
+        <div class="st"><span class="n">05</span><div><b>Exhibition messaging</b><span>One clear message the stall communicates at a glance.</span></div></div>
+        <div class="st"><span class="n">06</span><div><b>Sales communication</b><span>What the team says, shows and leaves behind.</span></div></div>
+        <div class="st"><span class="n">07</span><div><b>Tracking &amp; preparation</b><span>Lists, owners and a tracker, ready before the show opens.</span></div></div>
+      </div>
+    </div>
+    <div class="outcome r" style="--d:6"><span class="k">Outcome</span>Walk into ACETECH with a target list and meetings already in the calendar.</div>
+  </div>
+</section>
+
+<!-- 09 · DURING -->
+<section class="slide dark s9" data-tone="dark">
+  <div class="meta"><span>The Brandologist Co. × Store My Goods</span><span>Phase 02 · During</span></div>
+  <div class="body">
+    <div class="eyebrow r" style="--d:0">Phase 02 · During ACETECH</div>
+    <h2 class="r" style="--d:1">Every Visitor Gets <em>Sorted</em>, Not Just Greeted.</h2>
+    <div class="s9-grid">
+      <div class="flow">
+        <div class="fs r" style="--d:2"><span class="ib"><svg class="ic"><use href="#i-mega"/></svg></span><div><div class="k">Stop</div><b>Stall communication that works</b><span>A clear message and natural conversation starters that bring the right people in.</span></div></div>
+        <div class="fs r" style="--d:3"><span class="ib"><svg class="ic"><use href="#i-users"/></svg></span><div><div class="k">Qualify</div><b>Role clarity for the team</b><span>Who greets, who qualifies, who handles architects. A few simple questions to sort every visitor.</span></div></div>
+        <div class="fs r" style="--d:4"><span class="ib"><svg class="ic"><use href="#i-scan"/></svg></span><div><div class="k">Capture</div><b>Digital lead capture</b><span>Every conversation logged on the spot. No visiting cards lost in a bag.</span></div></div>
+        <div class="fs r" style="--d:5"><span class="ib"><svg class="ic"><use href="#i-flag"/></svg></span><div><div class="k">Commit</div><b>A next step before they leave</b><span>A meeting, a site visit or a call, agreed while interest is high.</span></div></div>
+      </div>
+      <div class="fw r" style="--d:4">
+        <div class="hd"><span class="k">Lead qualification framework</span><small>Tagged before the visitor leaves</small></div>
+        <div class="tier hot"><div class="tg"><i></i>HOT</div><div class="who">Live project or clear need. Decision-maker involved.</div><div class="nx"><small>Next step</small>Meeting fixed at the stall</div></div>
+        <div class="tier warm"><div class="tg"><i></i>WARM</div><div class="who">Relevant profile. Need is likely, but not immediate.</div><div class="nx"><small>Next step</small>Structured follow-up and nurture</div></div>
+        <div class="tier cold"><div class="tg"><i></i>COLD</div><div class="who">Not a fit right now.</div><div class="nx"><small>Next step</small>Light-touch, kept on file</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 · AFTER -->
+<section class="slide light s10" data-tone="light">
+  <div class="meta"><span>The Brandologist Co. × Store My Goods</span><span>Phase 03 · After</span></div>
+  <div class="body">
+    <div class="eyebrow r" style="--d:0">Phase 03 · After ACETECH</div>
+    <h2 class="r" style="--d:1">The Exhibition Ends. The Business Development <em>Shouldn't.</em></h2>
+    <div class="pipe">
+      <div class="cv r" style="--d:2"><span class="n">01</span><b>Qualified lead</b></div>
+      <div class="cv r" style="--d:3"><span class="n">02</span><b>Personalised follow‑up</b></div>
+      <div class="cv r" style="--d:4"><span class="n">03</span><b>Meeting</b></div>
+      <div class="cv r" style="--d:5"><span class="n">04</span><b>Proposal / partnership discussion</b></div>
+      <div class="cv r" style="--d:6"><span class="n">05</span><b>Business opportunity</b></div>
+    </div>
+    <div class="disc-k k r" style="--d:6">What keeps the pipeline moving</div>
+    <div class="disc">
+      <div class="dc r" style="--d:7"><span class="ib"><svg class="ic"><use href="#i-clock"/></svg></span><b>Follow-up discipline</b><span>Hot leads contacted within 48 hours. A fixed rhythm for everyone else.</span></div>
+      <div class="dc r" style="--d:8"><span class="ib"><svg class="ic"><use href="#i-owner"/></svg></span><b>Clear ownership</b><span>Every lead has one named owner. Nothing falls between people.</span></div>
+      <div class="dc r" style="--d:9"><span class="ib"><svg class="ic"><use href="#i-db"/></svg></span><b>CRM tracking</b><span>Every touchpoint logged, so no opportunity lives only in someone's phone.</span></div>
+      <div class="dc r" style="--d:10"><span class="ib"><svg class="ic"><use href="#i-chart"/></svg></span><b>Reporting</b><span>A simple view of what moved, what's stuck and what happens next.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 · SUCCESS -->
+<section class="slide dark s11" data-tone="dark">
+  <div class="meta"><span>The Brandologist Co. × Store My Goods</span><span>Measuring success</span></div>
+  <div class="body">
+    <div class="eyebrow r" style="--d:0">What success looks like</div>
+    <h2 class="r" style="--d:1">Success, <em>Measured</em>, Not Assumed.</h2>
+    <div class="dash r" style="--d:2">
+      <div class="top"><div class="t"><span class="dots"><i></i><i></i><i></i></span>ACETECH 2026 · Campaign scorecard</div><span class="status k"><i></i>Targets to be jointly agreed</span></div>
+      <div class="tiles">
+        <div class="tile"><div class="row"><span class="nm">Architect &amp; designer meetings</span><span class="stg">Before · During</span></div><div class="val"><small>Target</small><span>To be agreed</span></div><div class="trk"></div></div>
+        <div class="tile"><div class="row"><span class="nm">Qualified B2B leads</span><span class="stg">During</span></div><div class="val"><small>Target</small><span>To be agreed</span></div><div class="trk"></div></div>
+        <div class="tile"><div class="row"><span class="nm">Relevant partnership conversations</span><span class="stg">During</span></div><div class="val"><small>Target</small><span>To be agreed</span></div><div class="trk"></div></div>
+        <div class="tile"><div class="row"><span class="nm">Follow-up meetings scheduled</span><span class="stg">After</span></div><div class="val"><small>Target</small><span>To be agreed</span></div><div class="trk"></div></div>
+        <div class="tile"><div class="row"><span class="nm">Proposals or partnership discussions initiated</span><span class="stg">After</span></div><div class="val"><small>Target</small><span>To be agreed</span></div><div class="trk"></div></div>
+        <div class="tile"><div class="row"><span class="nm">Attributable business opportunities</span><span class="stg">After</span></div><div class="val"><small>Target</small><span>To be agreed</span></div><div class="trk"></div></div>
+      </div>
+    </div>
+    <p class="note r" style="--d:4">We set the targets together during planning, track them through the campaign, and report against them after ACETECH.</p>
+  </div>
+</section>
+
+<!-- 12 · INVESTMENT -->
+<section class="slide light s12" data-tone="light">
+  <div class="meta"><span>The Brandologist Co. × Store My Goods</span><span>Investment</span></div>
+  <div class="body">
+    <div class="eyebrow r" style="--d:0">Engagement options</div>
+    <h2 class="r" style="--d:1">Two Ways to <em>Work Together</em>.</h2>
+    <div class="plans">
+      <div class="plan a r" style="--d:2">
+        <div class="opt k">Option A</div>
+        <h3>Exhibition ROI Blueprint</h3>
+        <div class="fee"><span class="p">₹95,000</span><span class="g">+ 18% GST</span></div>
+        <div class="tot">Total including GST: ₹1,12,100</div>
+        <ul class="inc">
+          <li><svg class="ic"><use href="#i-check"/></svg>Audience &amp; partnership strategy</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Core proposition &amp; stall messaging</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Invitation &amp; follow-up templates</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Lead capture &amp; qualification playbook</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Team briefing</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Execution roadmap</li>
+        </ul>
+        <div class="fit"><svg class="ic"><use href="#i-users"/></svg><span>SMG's team primarily executes, using our blueprint and playbook. Best for teams with in-house bandwidth.</span></div>
+      </div>
+      <div class="plan b r" style="--d:3">
+        <span class="badge">Recommended for hands-on campaign support</span>
+        <div class="opt k">Option B</div>
+        <h3>Exhibition Campaign Support</h3>
+        <div class="fee"><span class="p">₹2,75,000</span><span class="g">+ 18% GST</span></div>
+        <div class="tot">Total including GST: ₹3,24,500</div>
+        <ul class="inc">
+          <li class="all"><svg class="ic"><use href="#i-check"/></svg>Everything in Option A, plus:</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Campaign messaging support</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Creative coordination</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Pre-event outreach planning &amp; tracking</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Lead-system setup</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Team enablement</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Post-event follow-up campaign support</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Periodic reviews &amp; optimisation</li>
+        </ul>
+        <div class="fit"><svg class="ic"><use href="#i-users"/></svg><span>We work alongside SMG's team from planning through follow-up. Best when you want an experienced partner in the campaign.</span></div>
+      </div>
+    </div>
+    <p class="terms r" style="--d:5">Proposed fees. Final deliverables, ownership and timelines will be governed by an agreed scope of work. GST is additional. Media spends, booth fabrication, printing, travel and third-party expenses are excluded unless specifically agreed.</p>
+  </div>
+</section>
+
+<!-- 13 · COST OF MISSING -->
+<section class="slide dark s13" data-tone="dark">
+  <div class="meta"><span>The Brandologist Co. × Store My Goods</span><span>The cost of a weak system</span></div>
+  <div class="body">
+    <div class="eyebrow r" style="--d:0">Why a system matters</div>
+    <h2 class="r" style="--d:1">An Exhibition Is Already an Investment. A Conversion System Helps <em>More of It Count.</em></h2>
+    <div class="s13-grid">
+      <div class="spent r" style="--d:2">
+        <div class="k">Spent either way</div>
+        <ul>
+          <li><svg class="ic"><use href="#i-stall"/></svg>Stall space &amp; fabrication</li>
+          <li><svg class="ic"><use href="#i-plane"/></svg>Travel &amp; logistics</li>
+          <li><svg class="ic"><use href="#i-time"/></svg>Senior team time at the show</li>
+          <li><svg class="ic"><use href="#i-doc"/></svg>Collateral &amp; promotion</li>
+        </ul>
+        <div class="end">These costs are fixed. What they produce isn't.</div>
+      </div>
+      <div class="r" style="--d:3">
+        <svg class="pipesvg" viewBox="0 0 960 170" aria-hidden="true">
+          <defs><linearGradient id="pg" x1="0" x2="1"><stop offset="0" stop-color="#d4a017"/><stop offset="1" stop-color="#e3c47a" stop-opacity=".75"/></linearGradient></defs>
+          <text class="tm" x="0" y="18" fill="rgba(246,242,234,.5)">EXHIBITION INVESTMENT</text>
+          <text class="tm" x="958" y="18" text-anchor="end" fill="rgba(246,242,234,.5)">BUSINESS OUTCOMES</text>
+          <path d="M0 38 H160 V45 H480 V52 H800 V58 H905 V82 H800 V88 H480 V95 H160 V102 H0 Z" fill="url(#pg)"/>
+          <g fill="#0a1628" opacity=".35"><rect x="156" y="38" width="8" height="64"/><rect x="476" y="45" width="8" height="50"/><rect x="796" y="52" width="8" height="36"/></g>
+          <path d="M914 70 H950 M940 62 l10 8 -10 8" stroke="#e3c47a" stroke-width="2" fill="none"/>
+          <g stroke="#ef5a5f" stroke-width="1" stroke-dasharray="3 4" opacity=".55"><path d="M160 104 V168"/><path d="M480 97 V168"/><path d="M800 90 V168"/></g>
+          <g transform="translate(160,106)"><path class="drip" d="M0 0 C3 6 6 10 6 14 A6 6 0 1 1 -6 14 C-6 10 -3 6 0 0Z" fill="#ef5a5f"/></g>
+          <g transform="translate(480,99)"><path class="drip" style="animation-delay:.8s" d="M0 0 C3 6 6 10 6 14 A6 6 0 1 1 -6 14 C-6 10 -3 6 0 0Z" fill="#ef5a5f"/></g>
+          <g transform="translate(800,92)"><path class="drip" style="animation-delay:1.6s" d="M0 0 C3 6 6 10 6 14 A6 6 0 1 1 -6 14 C-6 10 -3 6 0 0Z" fill="#ef5a5f"/></g>
+        </svg>
+        <div class="leaks">
+          <div class="leak"><div class="k">Leak 01</div><b>Weak pre-event targeting</b><span>The right architects never plan a visit.</span></div>
+          <div class="leak"><div class="k">Leak 02</div><b>Inconsistent qualification</b><span>Strong prospects get the same treatment as casual visitors.</span></div>
+          <div class="leak"><div class="k">Leak 03</div><b>Poor follow-up</b><span>Interest cools, or goes to whoever calls first.</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="close r" style="--d:5">The investment is already committed. A system decides <em>how much of it turns into business.</em></p>
+  </div>
+</section>
+
+<!-- 14 · NEXT STEP -->
+<section class="slide dark s14" data-tone="dark">
+  <svg class="orbit" viewBox="0 0 1000 1000" aria-hidden="true">
+    <g fill="none" stroke="rgba(212,160,23,.14)"><circle cx="500" cy="500" r="200"/><circle cx="500" cy="500" r="300"/><circle cx="500" cy="500" r="400"/><circle cx="500" cy="500" r="490"/></g>
+    <g class="spin"><circle cx="900" cy="500" r="5" fill="#d4a017"/><circle cx="500" cy="200" r="3.5" fill="#e3c47a" opacity=".6"/></g>
+  </svg>
+  <div class="meta"><span>The Brandologist Co. × Store My Goods</span><span>Next step</span></div>
+  <div class="body">
+    <div class="eyebrow r" style="--d:0">The next step</div>
+    <h2 class="r" style="--d:1">Let's Make ACETECH the Beginning of <em>Long-Term</em> Business Relationships.</h2>
+    <div class="steps">
+      <div class="stp r" style="--d:2"><span class="n">1</span><div><b>Select the engagement model</b><span>Exhibition ROI Blueprint, or hands-on Campaign Support.</span></div></div>
+      <div class="stp r" style="--d:3"><span class="n">2</span><div><b>Approve scope and commercials</b><span>Deliverables, ownership and timelines confirmed in writing.</span></div></div>
+      <div class="stp r" style="--d:4"><span class="n">3</span><div><b>Appoint project owners and begin planning</b><span>One owner on each side. Audience mapping starts first.</span></div></div>
+    </div>
+    <div class="urg r" style="--d:5"><svg class="ic"><use href="#i-cal"/></svg>ACETECH is in December. Invitations and pre-booked meetings need lead time, so the earlier we start, the stronger the Before phase.</div>
+    <div class="final r" style="--d:6">
+      <blockquote>“The objective isn't just to meet more people at ACETECH. It's to create more meaningful business opportunities from the people we meet.”</blockquote>
+      <div class="sig"><b>Sudhir Makhija</b><span class="k">The Brandologist Co. · hello@brandologist.in</span></div>
+    </div>
+  </div>
+</section>
+
+  <div id="hud">
+    <div class="brand"><i></i>The Brandologist Co.</div>
+    <div id="hint">← → to navigate · F for fullscreen</div>
+    <div class="nav">
+      <button id="prev" aria-label="Previous slide"><svg class="ic"><use href="#i-left"/></svg></button>
+      <span id="count">01 / 14</span>
+      <button id="next" aria-label="Next slide"><svg class="ic"><use href="#i-right"/></svg></button>
+      <button id="fs" aria-label="Toggle fullscreen"><svg class="ic"><use href="#i-expand"/></svg></button>
+    </div>
+  </div>
+  <div id="bar"><i></i></div>
+</div></div>
+
+<script>
+(function(){
+  var stage=document.getElementById('stage');
+  var slides=[].slice.call(stage.querySelectorAll('.slide'));
+  var N=slides.length, cur=-1;
+  var cnt=document.getElementById('count'), bar=document.querySelector('#bar i'), hint=document.getElementById('hint');
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function pad(n){return (n<10?'0':'')+n;}
+  function fmt(n){try{return n.toLocaleString('en-IN');}catch(e){return String(n);}}
+
+  function fit(){var s=Math.min(window.innerWidth/1600,window.innerHeight/900);stage.style.transform='scale('+s+')';}
+
+  function countUp(slide){
+    [].forEach.call(slide.querySelectorAll('[data-count]'),function(el){
+      var t=+el.getAttribute('data-count');
+      if(reduce){el.textContent=fmt(t);return;}
+      el.textContent=fmt(0);
+      var token={};el._tok=token;
+      setTimeout(function(){
+        var s0=performance.now();
+        (function step(now){
+          if(el._tok!==token)return;
+          var p=Math.min(1,(now-s0)/1400),e=1-Math.pow(1-p,3);
+          el.textContent=fmt(Math.round(t*e));
+          if(p<1)requestAnimationFrame(step);
+        })(s0);
+      },450);
+    });
+  }
+
+  function go(n,fromHash){
+    n=Math.max(0,Math.min(N-1,n));
+    if(n===cur)return;
+    if(cur>=0){
+      var old=slides[cur];old.classList.remove('active');old.classList.add('leaving');
+      setTimeout(function(){old.classList.remove('leaving');},750);
+    }
+    cur=n;var s=slides[n];
+    s.classList.remove('leaving');s.classList.add('active');
+    stage.className='tone-'+(s.getAttribute('data-tone')||'dark');
+    cnt.textContent=pad(n+1)+' / '+pad(N);
+    bar.style.width=((n+1)/N*100)+'%';
+    countUp(s);
+    if(n>0)hint.classList.add('off');
+    if(!fromHash){try{history.replaceState(null,'','#'+(n+1));}catch(e){}}
+  }
+
+  function fsEl(){return document.fullscreenElement||document.webkitFullscreenElement;}
+  function toggleFS(){
+    var d=document.documentElement;
+    try{
+      if(!fsEl()){(d.requestFullscreen||d.webkitRequestFullscreen).call(d);}
+      else{(document.exitFullscreen||document.webkitExitFullscreen).call(document);}
+    }catch(e){}
+  }
+
+  document.addEventListener('keydown',function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey)return;
+    var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='ArrowDown'){e.preventDefault();go(cur+1);}
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'){e.preventDefault();go(cur-1);}
+    else if(k==='Home'){e.preventDefault();go(0);}
+    else if(k==='End'){e.preventDefault();go(N-1);}
+    else if(k==='f'||k==='F'){e.preventDefault();toggleFS();}
+    else if(k==='Escape'&&fsEl()){toggleFS();}
+  });
+  function btn(id,fn){var b=document.getElementById(id);b.addEventListener('click',function(){fn();b.blur();});}
+  btn('prev',function(){go(cur-1);});
+  btn('next',function(){go(cur+1);});
+  btn('fs',toggleFS);
+
+  var tx=null,ty=null;
+  window.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+  window.addEventListener('touchend',function(e){
+    if(tx===null)return;
+    var dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy))go(cur+(dx<0?1:-1));
+    tx=ty=null;
+  },{passive:true});
+
+  window.addEventListener('resize',fit);
+  window.addEventListener('hashchange',function(){var h=parseInt(location.hash.slice(1),10);if(h)go(h-1,true);});
+
+  // crowd dots for slide 4
+  var crowd=document.getElementById('crowd');
+  if(crowd){
+    var seed=11,h='';
+    function rnd(){seed=(seed*9301+49297)%233280;return seed/233280;}
+    for(var i=0;i<120;i++){
+      h+='<circle cx="'+(10+rnd()*480).toFixed(1)+'" cy="'+(8+rnd()*124).toFixed(1)+'" r="'+(2.8+rnd()*3.6).toFixed(1)+'" fill="#6b7385" opacity="'+(.16+rnd()*.42).toFixed(2)+'"/>';
+    }
+    crowd.innerHTML=h;
+  }
+
+  fit();
+  var start=parseInt((location.hash||'').slice(1),10);
+  go(start?start-1:0,true);
+})();
+</script>
+</body>
+</html>
